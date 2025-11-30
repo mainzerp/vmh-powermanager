@@ -62,15 +62,19 @@ cp stack.env.example stack.env
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-### Initial Setup
+### First Login
+
+On first startup, an admin user is automatically created. The initial password is displayed in the backend container logs:
 
 ```bash
-# Create admin user
-docker exec -it vmpm-backend python init_admin.py
+# View the initial admin password
+docker logs vmhpm-backend 2>&1 | grep -i "admin"
 
 # Access the application
 # https://your-server (default self-signed certificate)
 ```
+
+> **Note:** Change the admin password immediately after first login!
 
 ## Architecture
 
@@ -156,3 +160,4 @@ This project is proprietary software. All rights reserved.
 ## Support
 
 For issues and feature requests, please create a GitHub issue.
+
