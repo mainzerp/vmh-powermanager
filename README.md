@@ -128,12 +128,6 @@ POSTGRES_PASSWORD=your_secure_password
 # Security
 JWT_SECRET=your_jwt_secret
 
-# SMTP Notifications (optional)
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=notifications@example.com
-SMTP_PASSWORD=smtp_password
-
 # Worker Concurrency
 CELERY_MONITORING_CONCURRENCY=2
 CELERY_ORCHESTRATION_CONCURRENCY=2
