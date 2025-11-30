@@ -151,7 +151,9 @@ CELERY_GENERAL_CONCURRENCY=2
 
 ## Screenshots
 
-*Add screenshots of your dashboard, plan execution, and UPS monitoring here*
+![Dashboard](docs/images/dashboard.png)
+
+*The dashboard showing UPS status, orchestration plans, and managed systems.*
 
 ## License
 
@@ -160,4 +162,5 @@ This project is proprietary software. All rights reserved.
 ## Support
 
 For issues and feature requests, please create a GitHub issue.
+
 
