@@ -1,0 +1,191 @@
+services:
+  database:
+    image: ${DATABASE_IMAGE:-ghcr.io/mainzerp/vmh-powermanager-database:latest}
+    container_name: vmhpm-database
+    env_file:
+      - stack.env
+    environment:
+      POSTGRES_DB: vmpm_db
+      POSTGRES_USER: vmpm_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vmpm_user -d vmpm_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/mainzerp/vmh-powermanager-backend:latest}
+    container_name: vmhpm-backend
+    env_file:
+      - stack.env
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://vmpm_user:${POSTGRES_PASSWORD}@database:5432/vmpm_db
+      REDIS_URL: redis://redis:6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      NGINX_INTERNAL_URL: http://frontend
+      JWT_SECRET: ${JWT_SECRET}
+      LOG_LEVEL: INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: /app/entrypoint.sh
+
+  redis:
+    image: redis:7-alpine
+    container_name: vmhpm-redis
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/mainzerp/vmh-powermanager-frontend:latest}
+    container_name: vmhpm-frontend
+    env_file:
+      - stack.env
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${NGINX_HTTPS_PORT}:443"
+    # To use custom SSL certificates, add a volumes block such as:
+    # volumes:
+    #   - ${SSL_CERT_PATH:-/etc/nginx/certs/cert.pem}:/etc/nginx/certs/cert.pem:ro
+    #   - ${SSL_KEY_PATH:-/etc/nginx/certs/key.pem}:/etc/nginx/certs/key.pem:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Celery Worker für UPS-Monitoring (kritisch, schnelle Reaktionszeit)
+  celery_worker_monitoring:
+    image: ${BACKEND_IMAGE:-ghcr.io/mainzerp/vmh-powermanager-backend:latest}
+    container_name: vmhpm-celery-monitoring
+    env_file:
+      - stack.env
+    command: celery -A app.celery_app worker -Q monitoring --loglevel=info --concurrency=${CELERY_MONITORING_CONCURRENCY:-2} -n monitoring@%h
+    depends_on:
+      redis:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://vmpm_user:${POSTGRES_PASSWORD}@database:5432/vmpm_db
+      REDIS_URL: redis://redis:6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      LOG_LEVEL: INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import sys; cmdline = open('/proc/1/cmdline').read(); sys.exit(0 if 'celery' in cmdline and 'worker' in cmdline else 1)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Celery Worker für Plan-Orchestration (langlebige Tasks)
+  celery_worker_orchestration:
+    image: ${BACKEND_IMAGE:-ghcr.io/mainzerp/vmh-powermanager-backend:latest}
+    container_name: vmhpm-celery-orchestration
+    env_file:
+      - stack.env
+    command: celery -A app.celery_app worker -Q orchestration --loglevel=info --concurrency=${CELERY_ORCHESTRATION_CONCURRENCY:-2} -n orchestration@%h
+    depends_on:
+      redis:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://vmpm_user:${POSTGRES_PASSWORD}@database:5432/vmpm_db
+      REDIS_URL: redis://redis:6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      LOG_LEVEL: INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import sys; cmdline = open('/proc/1/cmdline').read(); sys.exit(0 if 'celery' in cmdline and 'worker' in cmdline else 1)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Celery Worker für Notifications und Default-Tasks
+  celery_worker_general:
+    image: ${BACKEND_IMAGE:-ghcr.io/mainzerp/vmh-powermanager-backend:latest}
+    container_name: vmhpm-celery-general
+    env_file:
+      - stack.env
+    command: celery -A app.celery_app worker -Q notifications,default --loglevel=info --concurrency=${CELERY_GENERAL_CONCURRENCY:-2} -n general@%h
+    depends_on:
+      redis:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://vmpm_user:${POSTGRES_PASSWORD}@database:5432/vmpm_db
+      REDIS_URL: redis://redis:6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      LOG_LEVEL: INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import sys; cmdline = open('/proc/1/cmdline').read(); sys.exit(0 if 'celery' in cmdline and 'worker' in cmdline else 1)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  celery_beat:
+    image: ${BACKEND_IMAGE:-ghcr.io/mainzerp/vmh-powermanager-backend:latest}
+    container_name: vmhpm-celery-beat
+    env_file:
+      - stack.env
+    command: celery -A app.celery_app beat --loglevel=info -s /tmp/celery-beat-schedule
+    depends_on:
+      redis:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://vmpm_user:${POSTGRES_PASSWORD}@database:5432/vmpm_db
+      REDIS_URL: redis://redis:6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      LOG_LEVEL: INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "celery", "-A", "app.celery_app", "inspect", "scheduled"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  database_data:
+  redis_data:
+
+# Notes:
+# 1. Secrets werden aus stack.env (oder eigener --env-file) geladen (POSTGRES_PASSWORD, JWT_SECRET, NGINX_HTTPS_PORT)
+# 2. Passe stack.env vor Deployment mit setup-secrets.sh/ps1 oder manuell an
+# 3. Beispiel: docker-compose --env-file stack.env -f docker-compose.prod.yml up
