@@ -21,19 +21,12 @@
 
 ## ✨ Features
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
 ### 🔌 UPS Monitoring
 
 - Real-time SNMP monitoring of UPS devices (APC, CyberPower, etc.)
 - Battery runtime, charge level, and input voltage tracking
 - Automatic alerts when thresholds are breached
 - Support for SNMP v1, v2c, and v3
-
-</td>
-<td width="50%" valign="top">
 
 ### 🖥️ Multi-Platform VM Control
 
@@ -43,11 +36,6 @@
 - SSH/WinRM – Shutdown commands
 - WOL – Wake-on-LAN startup
 
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-
 ### 📋 Orchestration Plans
 
 - Multi-phase execution (sequential and parallel)
@@ -56,9 +44,6 @@
 - UPS-triggered automatic execution
 - Visual execution progress badges
 
-</td>
-<td width="50%" valign="top">
-
 ### 🔐 Security
 
 - JWT-based authentication with TOTP 2FA support
@@ -66,10 +51,6 @@
 - HTTPS with TLS encryption
 - Secure SNMP v3 support
 - Encrypted credential storage
-
-</td>
-</tr>
-</table>
 
 ---
 
