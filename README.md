@@ -1,12 +1,29 @@
-# VM Host Power Manager
+# 🔋 VM Host Power Manager
 
-[![Docker Build](https://img.shields.io/badge/docker-build-blue)](https://github.com/mainzerp/vmh-powermanager/pkgs/container/vmh-powermanager-backend)
-[![Platform](https://img.shields.io/badge/platform-x86__64%20%7C%20ARM64-green)](https://github.com/mainzerp/vmh-powermanager)
-[![License](https://img.shields.io/badge/license-proprietary-red)](LICENSE)
+<div align="center">
 
-A comprehensive orchestration platform for managing VM and system power states during UPS runtime events. Automatically detects low battery conditions and executes graceful shutdown/startup sequences for your infrastructure.
+[![Docker Build](https://img.shields.io/badge/docker-build-blue?style=for-the-badge&logo=docker)](https://github.com/mainzerp/vmh-powermanager/pkgs/container/vmh-powermanager-backend)
+[![Platform](https://img.shields.io/badge/platform-x86__64%20%7C%20ARM64-green?style=for-the-badge)](https://github.com/mainzerp/vmh-powermanager)
+[![License](https://img.shields.io/badge/license-proprietary-red?style=for-the-badge)](LICENSE)
 
-## Features
+**A comprehensive orchestration platform for managing VM and system power states during UPS runtime events.**
+
+*Automatically detects low battery conditions and executes graceful shutdown/startup sequences for your infrastructure.*
+
+[Features](#-features) •
+[Quick Start](#-quick-start) •
+[Architecture](#-architecture) •
+[Documentation](#-documentation)
+
+</div>
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
 
 ### 🔌 UPS Monitoring
 - Real-time SNMP monitoring of UPS devices (APC, CyberPower, etc.)
@@ -14,14 +31,22 @@ A comprehensive orchestration platform for managing VM and system power states d
 - Automatic alerts when thresholds are breached
 - Support for SNMP v1, v2c, and v3
 
+</td>
+<td width="50%">
+
 ### 🖥️ Multi-Platform VM Control
 | Platform | Capabilities |
 |----------|--------------|
 | VMware vCenter/ESXi | Full VM power control via API |
 | Proxmox VE | VM and container management |
 | Libvirt/KVM | Direct virsh integration |
-| Direct SSH/WinRM | Shutdown commands |
-| WOL | Startup |
+| SSH/WinRM | Shutdown commands |
+| WOL | Wake-on-LAN startup |
+
+</td>
+</tr>
+<tr>
+<td width="50%">
 
 ### 📋 Orchestration Plans
 - Multi-phase execution (sequential and parallel)
@@ -30,18 +55,29 @@ A comprehensive orchestration platform for managing VM and system power states d
 - UPS-triggered automatic execution
 - Visual execution progress badges
 
+</td>
+<td width="50%">
+
 ### 🔐 Security
 - JWT-based authentication with TOTP 2FA support
 - Role-based access control
 - HTTPS with TLS encryption
 - Secure SNMP v3 support
 
-## Quick Start
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Docker & Docker Compose
-- Network access to UPS devices (SNMP)
-- Credentials for hypervisors (vCenter, Proxmox, etc.)
+
+> **Requirements:**
+> - Docker & Docker Compose
+> - Network access to UPS devices (SNMP)
+> - Credentials for hypervisors (vCenter, Proxmox, etc.)
 
 ### Installation
 
@@ -70,38 +106,40 @@ On first startup, an admin user is automatically created. The initial password i
 ```bash
 # View the initial admin password
 docker logs vmhpm-backend 2>&1 | grep -i "admin"
-
-# Access the application
-# https://your-server (default self-signed certificate)
 ```
 
-> **Note:** Change the admin password immediately after first login!
+> ⚠️ **Important:** Change the admin password immediately after first login!
 
-## Architecture
+Access the application at `https://your-server` (default self-signed certificate)
+
+---
+
+## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Browser (React SPA)                      │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │ HTTPS / WSS
-┌───────────────────────────────▼─────────────────────────────────┐
-│                         Nginx Proxy                             │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │
-        ┌───────────────────────┼───────────────────────┐
-        ▼                       ▼                       ▼
-┌───────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Frontend    │     │    Backend      │     │  Celery Workers │
-│   (React)     │     │   (FastAPI)     │     │  (3 specialized)│
-└───────────────┘     └────────┬────────┘     └────────┬────────┘
-                               │                       │
-        ┌──────────────────────┴───────────────────────┘
-        │                      |
-        ▼                      ▼
-┌───────────────┐     ┌─────────────────┐
-│  PostgreSQL   │     │     Redis       │
-│  (Database)   │     │  (Task Queue)   │
-└───────────────┘     └─────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     Browser (React SPA)                     │
+└─────────────────────────────┬───────────────────────────────┘
+                              │ HTTPS / WSS
+┌─────────────────────────────▼───────────────────────────────┐
+│                        Nginx Proxy                          │
+└─────────────────────────────┬───────────────────────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+┌───────────────┐   ┌─────────────────┐   ┌─────────────────┐
+│   Frontend    │   │     Backend     │   │  Celery Workers │
+│    (React)    │   │    (FastAPI)    │   │  (3 specialized)│
+└───────────────┘   └────────┬────────┘   └────────┬────────┘
+                             │                     │
+                             └──────────┬──────────┘
+                                        │
+                           ┌────────────┴────────────┐
+                           ▼                         ▼
+                   ┌───────────────┐        ┌─────────────────┐
+                   │  PostgreSQL   │        │      Redis      │
+                   │  (Database)   │        │  (Task Queue)   │
+                   └───────────────┘        └─────────────────┘
 ```
 
 ### Celery Workers
@@ -112,14 +150,18 @@ docker logs vmhpm-backend 2>&1 | grep -i "admin"
 | **Orchestration** | Plan execution, VM power control |
 | **General** | Email/webhook notifications |
 
-## Platform Support
+---
+
+## 💻 Platform Support
 
 | Architecture | Platforms | Status |
 |--------------|-----------|--------|
 | **x86_64 / amd64** | Intel/AMD servers, most cloud VMs | ✅ Fully supported |
 | **ARM64 / aarch64** | Raspberry Pi 4/5, Apple Silicon, ARM servers | ✅ Fully supported |
 
-## Configuration
+---
+
+## ⚙️ Configuration
 
 Key environment variables in `stack.env`:
 
@@ -136,24 +178,34 @@ CELERY_ORCHESTRATION_CONCURRENCY=2
 CELERY_GENERAL_CONCURRENCY=2
 ```
 
-## Documentation
+---
+
+## 📚 Documentation
 
 | Document | Description |
 |----------|-------------|
 | [User Guide](docs/USER_GUIDE.md) | Frontend user manual |
 
-## Screenshots
+---
+
+## 📸 Screenshots
+
+<div align="center">
 
 ![Dashboard](docs/images/dashboard.png)
 
 *The dashboard showing UPS status, orchestration plans, and managed systems.*
 
-## License
+</div>
+
+---
+
+## 📄 License
 
 This project is proprietary software. All rights reserved.
 
-## Support
+---
 
-For issues and feature requests, please create a GitHub issue.
+## 🆘 Support
 
-
+For issues and feature requests, please [create a GitHub issue](https://github.com/mainzerp/vmh-powermanager/issues).
