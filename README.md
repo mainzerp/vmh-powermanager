@@ -26,6 +26,7 @@
 <td width="50%">
 
 ### 🔌 UPS Monitoring
+
 - Real-time SNMP monitoring of UPS devices (APC, CyberPower, etc.)
 - Battery runtime, charge level, and input voltage tracking
 - Automatic alerts when thresholds are breached
@@ -35,13 +36,12 @@
 <td width="50%">
 
 ### 🖥️ Multi-Platform VM Control
-| Platform | Capabilities |
-|----------|--------------|
-| VMware vCenter/ESXi | Full VM power control via API |
-| Proxmox VE | VM and container management |
-| Libvirt/KVM | Direct virsh integration |
-| SSH/WinRM | Shutdown commands |
-| WOL | Wake-on-LAN startup |
+
+- VMware vCenter/ESXi – Full VM power control via API
+- Proxmox VE – VM and container management
+- Libvirt/KVM – Direct virsh integration
+- SSH/WinRM – Shutdown commands
+- WOL – Wake-on-LAN startup
 
 </td>
 </tr>
@@ -49,6 +49,7 @@
 <td width="50%">
 
 ### 📋 Orchestration Plans
+
 - Multi-phase execution (sequential and parallel)
 - Graceful shutdown with configurable timeouts
 - Priority-based VM ordering
@@ -59,6 +60,7 @@
 <td width="50%">
 
 ### 🔐 Security
+
 - JWT-based authentication with TOTP 2FA support
 - Role-based access control
 - HTTPS with TLS encryption
