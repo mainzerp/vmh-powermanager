@@ -23,7 +23,7 @@
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 🔌 UPS Monitoring
 
@@ -33,7 +33,7 @@
 - Support for SNMP v1, v2c, and v3
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 🖥️ Multi-Platform VM Control
 
@@ -46,7 +46,7 @@
 </td>
 </tr>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 📋 Orchestration Plans
 
@@ -57,7 +57,7 @@
 - Visual execution progress badges
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 🔐 Security
 
@@ -65,6 +65,7 @@
 - Role-based access control
 - HTTPS with TLS encryption
 - Secure SNMP v3 support
+- Encrypted credential storage
 
 </td>
 </tr>
