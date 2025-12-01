@@ -138,6 +138,7 @@ CELERY_GENERAL_CONCURRENCY=2
 
 | Document | Description |
 |----------|-------------|
+| [User Guide](docs/USER_GUIDE.md) | Frontend user manual |
 | [Getting Started](docs/GETTING_STARTED.md) | Complete setup guide |
 | [API Documentation](docs/API_DOCUMENTATION_v1.1.0.md) | REST API reference |
 | [TOTP Setup](TOTP_IMPLEMENTATION.md) | Two-factor authentication |
