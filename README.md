@@ -20,7 +20,8 @@ A comprehensive orchestration platform for managing VM and system power states d
 | VMware vCenter/ESXi | Full VM power control via API |
 | Proxmox VE | VM and container management |
 | Libvirt/KVM | Direct virsh integration |
-| Direct SSH | Custom shutdown commands |
+| Direct SSH/WinRM | Shutdown commands |
+| WOL | Startup |
 
 ### 📋 Orchestration Plans
 - Multi-phase execution (sequential and parallel)
@@ -95,8 +96,9 @@ docker logs vmhpm-backend 2>&1 | grep -i "admin"
 └───────────────┘     └────────┬────────┘     └────────┬────────┘
                                │                       │
         ┌──────────────────────┴───────────────────────┘
-        │
-┌───────▼───────┐     ┌─────────────────┐
+        │                      |
+        ▼                      ▼
+┌───────────────┐     ┌─────────────────┐
 │  PostgreSQL   │     │     Redis       │
 │  (Database)   │     │  (Task Queue)   │
 └───────────────┘     └─────────────────┘
@@ -139,10 +141,6 @@ CELERY_GENERAL_CONCURRENCY=2
 | Document | Description |
 |----------|-------------|
 | [User Guide](docs/USER_GUIDE.md) | Frontend user manual |
-| [Getting Started](docs/GETTING_STARTED.md) | Complete setup guide |
-| [API Documentation](docs/API_DOCUMENTATION_v1.1.0.md) | REST API reference |
-| [TOTP Setup](TOTP_IMPLEMENTATION.md) | Two-factor authentication |
-| [FAQ](docs/FAQ.md) | Common questions |
 
 ## Screenshots
 
