@@ -1,45 +1,28 @@
-Testing Phase: Expect Breaking Changes
+# VM Host Power Manager
 
-# 🔋 VM Host Power Manager
+[![Docker Build](https://img.shields.io/badge/docker-build-blue)](https://github.com/mainzerp/vmh-powermanager/pkgs/container/vmh-powermanager-backend)
+[![Platform](https://img.shields.io/badge/platform-x86__64%20%7C%20ARM64-green)](https://github.com/mainzerp/vmh-powermanager)
+[![License](https://img.shields.io/badge/license-proprietary-red)](LICENSE)
 
-<div align="center">
+A comprehensive orchestration platform for managing VM and system power states during UPS runtime events. Automatically detects low battery conditions and executes graceful shutdown/startup sequences for your infrastructure.
 
-[![Docker Build](https://img.shields.io/badge/docker-build-blue?style=for-the-badge&logo=docker)](https://github.com/mainzerp/vmh-powermanager/pkgs/container/vmh-powermanager-backend)
-[![Platform](https://img.shields.io/badge/platform-x86__64%20%7C%20ARM64-green?style=for-the-badge)](https://github.com/mainzerp/vmh-powermanager)
-[![License](https://img.shields.io/badge/license-proprietary-red?style=for-the-badge)](LICENSE)
-
-**A comprehensive orchestration platform for managing VM and system power states during UPS runtime events.**
-
-*Automatically detects low battery conditions and executes graceful shutdown/startup sequences for your infrastructure.*
-
-[Features](#-features) •
-[Quick Start](#-quick-start) •
-[Architecture](#-architecture) •
-[Documentation](#-documentation)
-
-</div>
-
----
-
-## ✨ Features
+## Features
 
 ### 🔌 UPS Monitoring
-
 - Real-time SNMP monitoring of UPS devices (APC, CyberPower, etc.)
 - Battery runtime, charge level, and input voltage tracking
 - Automatic alerts when thresholds are breached
 - Support for SNMP v1, v2c, and v3
 
 ### 🖥️ Multi-Platform VM Control
-
-- VMware vCenter/ESXi – Full VM power control via API
-- Proxmox VE – VM and container management
-- Libvirt/KVM – Direct virsh integration
-- SSH/WinRM – Shutdown commands
-- WOL – Wake-on-LAN startup
+| Platform | Capabilities |
+|----------|--------------|
+| VMware vCenter/ESXi | Full VM power control via API |
+| Proxmox VE | VM and container management |
+| Libvirt/KVM | Direct virsh integration |
+| Direct SSH | Custom shutdown commands |
 
 ### 📋 Orchestration Plans
-
 - Multi-phase execution (sequential and parallel)
 - Graceful shutdown with configurable timeouts
 - Priority-based VM ordering
@@ -47,23 +30,17 @@ Testing Phase: Expect Breaking Changes
 - Visual execution progress badges
 
 ### 🔐 Security
-
 - JWT-based authentication with TOTP 2FA support
 - Role-based access control
 - HTTPS with TLS encryption
 - Secure SNMP v3 support
-- Encrypted credential storage
 
----
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
-
-> **Requirements:**
-> - Docker & Docker Compose
-> - Network access to UPS devices (SNMP)
-> - Credentials for hypervisors (vCenter, Proxmox, etc.)
+- Docker & Docker Compose
+- Network access to UPS devices (SNMP)
+- Credentials for hypervisors (vCenter, Proxmox, etc.)
 
 ### Installation
 
@@ -85,47 +62,40 @@ cp stack.env.example stack.env
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-### First Login
-
-On first startup, an admin user is automatically created. The initial password is displayed in the backend container logs:
+### Initial Setup
 
 ```bash
-# View the initial admin password
-docker logs vmhpm-backend 2>&1 | grep -i "admin"
+# Create admin user
+docker exec -it vmpm-backend python init_admin.py
+
+# Access the application
+# https://your-server (default self-signed certificate)
 ```
 
-> ⚠️ **Important:** Change the admin password immediately after first login!
-
-Access the application at `https://your-server` (default self-signed certificate)
-
----
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     Browser (React SPA)                     │
-└─────────────────────────────┬───────────────────────────────┘
-                              │ HTTPS / WSS
-┌─────────────────────────────▼───────────────────────────────┐
-│                        Nginx Proxy                          │
-└─────────────────────────────┬───────────────────────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        ▼                     ▼                     ▼
-┌───────────────┐   ┌─────────────────┐   ┌─────────────────┐
-│   Frontend    │   │     Backend     │   │  Celery Workers │
-│    (React)    │   │    (FastAPI)    │   │  (3 specialized)│
-└───────────────┘   └────────┬────────┘   └────────┬────────┘
-                             │                     │
-                             └──────────┬──────────┘
-                                        │
-                           ┌────────────┴────────────┐
-                           ▼                         ▼
-                   ┌───────────────┐        ┌─────────────────┐
-                   │  PostgreSQL   │        │      Redis      │
-                   │  (Database)   │        │  (Task Queue)   │
-                   └───────────────┘        └─────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        Browser (React SPA)                      │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │ HTTPS / WSS
+┌───────────────────────────────▼─────────────────────────────────┐
+│                         Nginx Proxy                             │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        ▼                       ▼                       ▼
+┌───────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Frontend    │     │    Backend      │     │  Celery Workers │
+│   (React)     │     │   (FastAPI)     │     │  (3 specialized)│
+└───────────────┘     └────────┬────────┘     └────────┬────────┘
+                               │                       │
+        ┌──────────────────────┴───────────────────────┘
+        │
+┌───────▼───────┐     ┌─────────────────┐
+│  PostgreSQL   │     │     Redis       │
+│  (Database)   │     │  (Task Queue)   │
+└───────────────┘     └─────────────────┘
 ```
 
 ### Celery Workers
@@ -136,18 +106,14 @@ Access the application at `https://your-server` (default self-signed certificate
 | **Orchestration** | Plan execution, VM power control |
 | **General** | Email/webhook notifications |
 
----
-
-## 💻 Platform Support
+## Platform Support
 
 | Architecture | Platforms | Status |
 |--------------|-----------|--------|
 | **x86_64 / amd64** | Intel/AMD servers, most cloud VMs | ✅ Fully supported |
 | **ARM64 / aarch64** | Raspberry Pi 4/5, Apple Silicon, ARM servers | ✅ Fully supported |
 
----
-
-## ⚙️ Configuration
+## Configuration
 
 Key environment variables in `stack.env`:
 
@@ -158,40 +124,36 @@ POSTGRES_PASSWORD=your_secure_password
 # Security
 JWT_SECRET=your_jwt_secret
 
+# SMTP Notifications (optional)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=notifications@example.com
+SMTP_PASSWORD=smtp_password
+
 # Worker Concurrency
 CELERY_MONITORING_CONCURRENCY=2
 CELERY_ORCHESTRATION_CONCURRENCY=2
 CELERY_GENERAL_CONCURRENCY=2
 ```
 
----
-
-## 📚 Documentation
+## Documentation
 
 | Document | Description |
 |----------|-------------|
 | [User Guide](docs/USER_GUIDE.md) | Frontend user manual |
+| [Getting Started](docs/GETTING_STARTED.md) | Complete setup guide |
+| [API Documentation](docs/API_DOCUMENTATION_v1.1.0.md) | REST API reference |
+| [TOTP Setup](TOTP_IMPLEMENTATION.md) | Two-factor authentication |
+| [FAQ](docs/FAQ.md) | Common questions |
 
----
+## Screenshots
 
-## 📸 Screenshots
+*Add screenshots of your dashboard, plan execution, and UPS monitoring here*
 
-<div align="center">
-
-![Dashboard](docs/images/dashboard.png)
-
-*The dashboard showing UPS status, orchestration plans, and managed systems.*
-
-</div>
-
----
-
-## 📄 License
+## License
 
 This project is proprietary software. All rights reserved.
 
----
+## Support
 
-## 🆘 Support
-
-For issues and feature requests, please [create a GitHub issue](https://github.com/mainzerp/vmh-powermanager/issues).
+For issues and feature requests, please create a GitHub issue.
