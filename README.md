@@ -6,8 +6,6 @@
 
 A comprehensive orchestration platform for managing VM and system power states during UPS runtime events. Automatically detects low battery conditions and executes graceful shutdown/startup sequences for your infrastructure.
 
-![Dashboard Screenshot](docs/images/dashboard.png)
-
 ## Features
 
 ### 🔌 UPS Monitoring
@@ -142,7 +140,7 @@ CELERY_GENERAL_CONCURRENCY=2
 ## Screenshots
 
 
-![Screenshot]([https://github.com/mainzerp/vmh-powermanager/blob/main/docs/images/dashboard.png])
+![Dashboard](docs/images/dashboard.png)
 
 
 ## License
