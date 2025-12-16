@@ -91,8 +91,8 @@ docker exec -it vmpm-backend python init_admin.py
 └───────────────┘     └────────┬────────┘     └────────┬────────┘
                                │                       │
         ┌──────────────────────┴───────────────────────┘
-        │
-┌───────▼───────┐     ┌─────────────────┐
+        │                      |
+┌───────▼───────┐     ┌────────▼────────┐
 │  PostgreSQL   │     │     Redis       │
 │  (Database)   │     │  (Task Queue)   │
 └───────────────┘     └─────────────────┘
@@ -123,12 +123,7 @@ POSTGRES_PASSWORD=your_secure_password
 
 # Security
 JWT_SECRET=your_jwt_secret
-
-# SMTP Notifications (optional)
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=notifications@example.com
-SMTP_PASSWORD=smtp_password
+ENCRYPTION_KEY=encryption_secret
 
 # Worker Concurrency
 CELERY_MONITORING_CONCURRENCY=2
@@ -141,10 +136,6 @@ CELERY_GENERAL_CONCURRENCY=2
 | Document | Description |
 |----------|-------------|
 | [User Guide](docs/USER_GUIDE.md) | Frontend user manual |
-| [Getting Started](docs/GETTING_STARTED.md) | Complete setup guide |
-| [API Documentation](docs/API_DOCUMENTATION_v1.1.0.md) | REST API reference |
-| [TOTP Setup](TOTP_IMPLEMENTATION.md) | Two-factor authentication |
-| [FAQ](docs/FAQ.md) | Common questions |
 
 ## Screenshots
 
