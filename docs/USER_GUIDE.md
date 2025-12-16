@@ -1,4 +1,4 @@
-# VM Host Power Manager - Frontend User Guide
+﻿# VM Host Power Manager - Frontend User Guide
 
 **Version**: 1.1.0  
 **Last Updated**: December 1, 2025
@@ -7,7 +7,7 @@ This guide explains how to use the VM Host Power Manager web interface to monito
 
 ---
 
-## 📚 Table of Contents
+## ðŸ“š Table of Contents
 
 1. [Getting Started](#getting-started)
 2. [Dashboard](#dashboard)
@@ -38,14 +38,14 @@ The main navigation is on the left sidebar:
 
 | Icon | Page | Description |
 |------|------|-------------|
-| 📊 | Dashboard | Overview of all systems and UPS status |
-| 🔋 | UPS Devices | Manage and monitor UPS units |
-| 🖥️ | Systems | Manage VMware/Proxmox hosts |
-| 📋 | Plans | Orchestration shutdown plans |
-| 🔔 | Notifications | Alert settings (Email, Webhook) |
-| 📜 | Events | System event log |
-| ⚙️ | Settings | Platform configuration |
-| 💾 | Backup | Backup and restore |
+| ðŸ“Š | Dashboard | Overview of all systems and UPS status |
+| ðŸ”‹ | UPS Devices | Manage and monitor UPS units |
+| ðŸ–¥ï¸ | Systems | Manage VMware/Proxmox hosts |
+| ðŸ“‹ | Plans | Orchestration shutdown plans |
+| ðŸ”” | Notifications | Alert settings (Email, Webhook) |
+| ðŸ“œ | Events | System event log |
+| âš™ï¸ | Settings | Platform configuration |
+| ðŸ’¾ | Backup | Backup and restore |
 
 ---
 
@@ -64,9 +64,9 @@ The Dashboard provides a real-time overview of your infrastructure.
 
 ### Health Indicators
 
-- 🟢 **Green**: All systems healthy
-- 🟡 **Yellow**: Warning (e.g., battery < 50%)
-- 🔴 **Red**: Critical (e.g., on battery, system offline)
+- ðŸŸ¢ **Green**: All systems healthy
+- ðŸŸ¡ **Yellow**: Warning (e.g., battery < 50%)
+- ðŸ”´ **Red**: Critical (e.g., on battery, system offline)
 
 ### Quick Actions
 
@@ -105,10 +105,10 @@ Each UPS shows:
 
 ### UPS Actions
 
-- **📊 View Details**: Full status and history
-- **⚙️ Edit**: Modify settings
-- **🔄 Refresh**: Force status update
-- **🗑️ Delete**: Remove UPS device
+- **ðŸ“Š View Details**: Full status and history
+- **âš™ï¸ Edit**: Modify settings
+- **ðŸ”„ Refresh**: Force status update
+- **ðŸ—‘ï¸ Delete**: Remove UPS device
 
 ### SNMP v3 Configuration
 
@@ -164,10 +164,10 @@ For SNMPv3, additional fields are required:
 
 | Status | Description |
 |--------|-------------|
-| 🟢 Online | Connected and responsive |
-| 🟡 Degraded | Partial connectivity |
-| 🔴 Offline | Cannot connect |
-| ⏸️ Maintenance | Manually paused |
+| ðŸŸ¢ Online | Connected and responsive |
+| ðŸŸ¡ Degraded | Partial connectivity |
+| ðŸ”´ Offline | Cannot connect |
+| â¸ï¸ Maintenance | Manually paused |
 
 ### VM List
 
@@ -182,46 +182,143 @@ Click on a system to see its VMs:
 
 ## Orchestration Plans
 
-Plans define automated shutdown sequences triggered by UPS events.
+Plans define automated shutdown and startup sequences triggered by UPS runtime thresholds. The **Flow Editor** provides a visual interface to create and manage these plans.
+
+### The Flow Editor
+
+The Flow Editor displays your plan as a visual flow diagram with three main sections:
+
+1. **UPS Mappings** (left) - Which UPS devices trigger this plan
+2. **Shutdown Phases** (center) - Phases executed during power failure  
+3. **Startup Phases** (right) - Phases executed during power recovery
 
 ### Creating a Plan
 
-1. Click **+ Create Plan**
-2. Configure trigger conditions:
+1. Navigate to **Plans**  Click **+ Create Plan**
+2. Enter plan name and description
+3. Use the Flow Editor to build your plan
 
-| Trigger | Description |
-|---------|-------------|
-| On Battery | UPS switches to battery |
+### Plan Settings
 
-3. Set trigger parameters:
-   - **Runtime Threshold**: e.g., 10 minutes
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Name** | Plan identifier | - |
+| **Description** | Optional notes | - |
+| **Active** | Enable/disable plan |  |
+| **Auto-Mirror Startup** | Automatically reverse shutdown order for startup |  |
 
-5. Click **Save Plan**
+### UPS Mappings
 
-### Plan Phases
+Map which UPS devices trigger this plan:
 
-Plans execute in phases:
+1. Click **+ Add UPS Mapping** in the Flow Editor
+2. Select a UPS device
+3. Configure settings:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Priority** | Execution order (lower = first) | 1 |
+| **Watch only for shutdown** | Only monitor for shutdown (not startup) |  |
+
+### Creating Phases
+
+Phases group devices that should shut down together. Click **+ Add Phase** to create:
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| **Phase Name** | Descriptive name (e.g., "Non-Critical VMs") | - |
+| **Description** | Optional details | - |
+| **Parallel Execution** | Run all devices simultaneously |  |
+| **Wait for Completion** | Wait before next phase starts |  |
+| **Step Delay (s)** | Wait time after starting each device | 0 |
+| **Shutdown Threshold (min)** | Execute when runtime drops to this value | 30 |
+| **Startup Threshold (min)** | Execute when runtime rises above this value | 60 |
+
+> **Note:** Phase Timeout is auto-calculated from device shutdown timeouts and cannot be edited manually.
+
+### Runtime Thresholds Explained
+
+Phases execute based on UPS runtime thresholds:
 
 ```
-Phase 1: Non-critical VMs
-    ↓ Wait 60 seconds
-Phase 2: Standard VMs
-    ↓ Wait 60 seconds
-Phase 3: Critical VMs
-    ↓ Wait 30 seconds
-Phase 4: ESXi/Proxmox hosts
+UPS Runtime    Shutdown Example (descending)
+100 min        
+                 
+ 60 min         Phase 1 triggers (non-critical)
+                 
+ 30 min         Phase 2 triggers (standard)
+                 
+ 15 min         Phase 3 triggers (critical)
+                 
+  5 min         Phase 4 triggers (hosts)
+                 
+  0 min        
+```
+
+During startup (power recovery), phases execute in **reverse order** based on startup thresholds.
+
+### Adding Devices to Phases
+
+1. Click on a phase node in the Flow Editor
+2. Click **+ Add Device**
+3. Select from available devices:
+   - **Systems** (VMware/Proxmox hosts)
+   - **VMs** (Virtual machines)
+4. Configure device settings:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Execution Order** | Order within phase | Auto |
+| **Shutdown Timeout (s)** | Max wait for graceful shutdown | 300 |
+| **Custom Command** | Optional shutdown command override | - |
+
+### Plan Execution Flow
+
+```
+Power Failure Detected
+        
+Check UPS Runtime
+        
+
+  Runtime  Phase 1 Threshold?   
+   Execute Phase 1              
+     Shutdown non-critical VMs  
+
+         (wait for completion)
+
+  Runtime  Phase 2 Threshold?   
+   Execute Phase 2              
+     Shutdown standard VMs      
+
+        
+    ... more phases ...
+        
+    All systems safe
 ```
 
 ### Plan Actions
 
-- **📋 Clone**: Duplicate plan
-- **🗑️ Delete**: Remove plan
+- ** Save**: Save current plan state
+- ** Execute Shutdown**: Manually trigger shutdown sequence
+- ** Execute Startup**: Manually trigger startup sequence
+- ** Clone**: Duplicate entire plan
+- ** Delete**: Remove plan
 
 ### Manual Execution
 
-1. Click **Execute Now** on any plan
-2. Confirm the action
-3. Monitor progress in real-time
+1. Open plan in Flow Editor
+2. Click **Execute Shutdown** or **Execute Startup**
+3. Confirm the action
+4. Monitor progress in real-time via the Flow Editor
+
+The Flow Editor shows live status during execution:
+-  **Pending** - Waiting to execute
+-  **Running** - Currently executing
+-  **Completed** - Successfully finished
+-  **Failed** - Error occurred
+
+---
+
 
 ---
 
@@ -231,7 +328,7 @@ Configure alerts for UPS events and system status changes.
 
 ### Email Notifications
 
-1. Go to **Notifications** → **Email**
+1. Go to **Notifications** â†’ **Email**
 2. Configure SMTP settings:
 
 | Field | Description |
@@ -248,7 +345,7 @@ Configure alerts for UPS events and system status changes.
 
 ### Webhook Notifications
 
-1. Go to **Notifications** → **Webhooks**
+1. Go to **Notifications** â†’ **Webhooks**
 2. Add a webhook:
 
 | Field | Description |
