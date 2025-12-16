@@ -1,4 +1,4 @@
-﻿# VM Host Power Manager - Frontend User Guide
+# VM Host Power Manager - Frontend User Guide
 
 **Version**: 1.1.0  
 **Last Updated**: December 1, 2025
@@ -180,151 +180,151 @@ Click on a system to see its VMs:
 
 ---
 
-## Orchestration Plans
-
-Plans define automated shutdown and startup sequences triggered by UPS runtime thresholds. The **Flow Editor** provides a visual interface to create and manage these plans.
-
-### The Flow Editor
-
-The Flow Editor displays your plan as a visual flow diagram with three main sections:
-
-1. **UPS Mappings** (left) - Which UPS devices trigger this plan
-2. **Shutdown Phases** (center) - Phases executed during power failure
-3. **Startup Phases** (right) - Phases executed during power recovery
-
-### Creating a Plan
-
-1. Navigate to **Plans** and click **+ Create Plan**
-2. Enter plan name and description
-3. Use the Flow Editor to build your plan
-
-### Plan Settings
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| **Name** | Plan identifier | - |
-| **Description** | Optional notes | - |
-| **Active** | Enable/disable plan | Yes |
-| **Auto-Mirror Startup** | Automatically reverse shutdown order for startup | Yes |
-
-### UPS Mappings
-
-Map which UPS devices trigger this plan:
-
-1. Click **+ Add UPS Mapping** in the Flow Editor
-2. Select a UPS device
-3. Configure settings:
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| **Priority** | Execution order (lower = first) | 1 |
-| **Watch only for shutdown** | Only monitor for shutdown (not startup) | No |
-
-### Creating Phases
-
-Phases group devices that should shut down together. Click **+ Add Phase** to create:
-
-| Field | Description | Default |
-|-------|-------------|---------|
-| **Phase Name** | Descriptive name (e.g., "Non-Critical VMs") | - |
-| **Description** | Optional details | - |
-| **Parallel Execution** | Run all devices simultaneously | No |
-| **Wait for Completion** | Wait before next phase starts | Yes |
-| **Step Delay (s)** | Wait time after starting each device | 0 |
-| **Shutdown Threshold (min)** | Execute when runtime drops to this value | 30 |
-| **Startup Threshold (min)** | Execute when runtime rises above this value | 60 |
-
-> **Note:** Phase Timeout is auto-calculated from device shutdown timeouts and cannot be edited manually.
-
-### Runtime Thresholds Explained
-
-Phases execute based on UPS runtime thresholds:
-
-`
-UPS Runtime    Shutdown Example (descending)
---------------------------------------------
-100 min        
-                 
- 60 min        <- Phase 1 triggers (non-critical)
-                 
- 30 min        <- Phase 2 triggers (standard)
-                 
- 15 min        <- Phase 3 triggers (critical)
-                 
-  5 min        <- Phase 4 triggers (hosts)
-                 
-  0 min        
---------------------------------------------
-`
-
-During startup (power recovery), phases execute in **reverse order** based on startup thresholds.
-
-### Adding Devices to Phases
-
-1. Click on a phase node in the Flow Editor
-2. Click **+ Add Device**
-3. Select from available devices:
-   - **Systems** (VMware/Proxmox hosts)
-   - **VMs** (Virtual machines)
-4. Configure device settings:
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| **Execution Order** | Order within phase | Auto |
-| **Shutdown Timeout (s)** | Max wait for graceful shutdown | 60 |
-| **Custom Command** | Optional shutdown command override | - |
-
-### Plan Execution Flow
-
-`
-Power Failure Detected
-        |
-        v
-Check UPS Runtime
-        |
-        v
-+----------------------------------+
-|  Runtime <= Phase 1 Threshold?   |
-|  -> Execute Phase 1              |
-|     -> Shutdown non-critical VMs |
-+----------------------------------+
-        |
-        v (wait for completion)
-+----------------------------------+
-|  Runtime <= Phase 2 Threshold?   |
-|  -> Execute Phase 2              |
-|     -> Shutdown standard VMs     |
-+----------------------------------+
-        |
-        v
-    ... more phases ...
-        |
-        v
-    All systems safe
-`
-
-### Plan Actions
-
-- **Save**: Save current plan state
-- **Execute Shutdown**: Manually trigger shutdown sequence
-- **Execute Startup**: Manually trigger startup sequence
-- **Clone**: Duplicate entire plan
-- **Delete**: Remove plan
-
-### Manual Execution
-
-1. Open plan in Flow Editor
-2. Click **Execute Shutdown** or **Execute Startup**
-3. Confirm the action
-4. Monitor progress in real-time via the Flow Editor
-
-The Flow Editor shows live status during execution:
-- **Pending** - Waiting to execute
-- **Running** - Currently executing
-- **Completed** - Successfully finished
-- **Failed** - Error occurred
-
----
+## Orchestration Plans
+
+Plans define automated shutdown and startup sequences triggered by UPS runtime thresholds. The **Flow Editor** provides a visual interface to create and manage these plans.
+
+### The Flow Editor
+
+The Flow Editor displays your plan as a visual flow diagram with three main sections:
+
+1. **UPS Mappings** (left) - Which UPS devices trigger this plan
+2. **Shutdown Phases** (center) - Phases executed during power failure
+3. **Startup Phases** (right) - Phases executed during power recovery
+
+### Creating a Plan
+
+1. Navigate to **Plans** and click **+ Create Plan**
+2. Enter plan name and description
+3. Use the Flow Editor to build your plan
+
+### Plan Settings
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Name** | Plan identifier | - |
+| **Description** | Optional notes | - |
+| **Active** | Enable/disable plan | Yes |
+| **Auto-Mirror Startup** | Automatically reverse shutdown order for startup | Yes |
+
+### UPS Mappings
+
+Map which UPS devices trigger this plan:
+
+1. Click **+ Add UPS Mapping** in the Flow Editor
+2. Select a UPS device
+3. Configure settings:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Priority** | Execution order (lower = first) | 1 |
+| **Watch only for shutdown** | Only monitor for shutdown (not startup) | No |
+
+### Creating Phases
+
+Phases group devices that should shut down together. Click **+ Add Phase** to create:
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| **Phase Name** | Descriptive name (e.g., "Non-Critical VMs") | - |
+| **Description** | Optional details | - |
+| **Parallel Execution** | Run all devices simultaneously | No |
+| **Wait for Completion** | Wait before next phase starts | Yes |
+| **Step Delay (s)** | Wait time after starting each device | 0 |
+| **Shutdown Threshold (min)** | Execute when runtime drops to this value | 30 |
+| **Startup Threshold (min)** | Execute when runtime rises above this value | 60 |
+
+> **Note:** Phase Timeout is auto-calculated from device shutdown timeouts and cannot be edited manually.
+
+### Runtime Thresholds Explained
+
+Phases execute based on UPS runtime thresholds:
+
+```
+UPS Runtime    Shutdown Example (descending)
+--------------------------------------------
+100 min        
+                 
+ 60 min        <- Phase 1 triggers (non-critical)
+                 
+ 30 min        <- Phase 2 triggers (standard)
+                 
+ 15 min        <- Phase 3 triggers (critical)
+                 
+  5 min        <- Phase 4 triggers (hosts)
+                 
+  0 min        
+--------------------------------------------
+```
+
+During startup (power recovery), phases execute in **reverse order** based on startup thresholds.
+
+### Adding Devices to Phases
+
+1. Click on a phase node in the Flow Editor
+2. Click **+ Add Device**
+3. Select from available devices:
+   - **Systems** (VMware/Proxmox hosts)
+   - **VMs** (Virtual machines)
+4. Configure device settings:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Execution Order** | Order within phase | Auto |
+| **Shutdown Timeout (s)** | Max wait for graceful shutdown | 60 |
+| **Custom Command** | Optional shutdown command override | - |
+
+### Plan Execution Flow
+
+```
+Power Failure Detected
+        |
+        v
+Check UPS Runtime
+        |
+        v
++----------------------------------+
+|  Runtime <= Phase 1 Threshold?   |
+|  -> Execute Phase 1              |
+|     -> Shutdown non-critical VMs |
++----------------------------------+
+        |
+        v (wait for completion)
++----------------------------------+
+|  Runtime <= Phase 2 Threshold?   |
+|  -> Execute Phase 2              |
+|     -> Shutdown standard VMs     |
++----------------------------------+
+        |
+        v
+    ... more phases ...
+        |
+        v
+    All systems safe
+```
+
+### Plan Actions
+
+- **Save**: Save current plan state
+- **Execute Shutdown**: Manually trigger shutdown sequence
+- **Execute Startup**: Manually trigger startup sequence
+- **Clone**: Duplicate entire plan
+- **Delete**: Remove plan
+
+### Manual Execution
+
+1. Open plan in Flow Editor
+2. Click **Execute Shutdown** or **Execute Startup**
+3. Confirm the action
+4. Monitor progress in real-time via the Flow Editor
+
+The Flow Editor shows live status during execution:
+- **Pending** - Waiting to execute
+- **Running** - Currently executing
+- **Completed** - Successfully finished
+- **Failed** - Error occurred
+
+---
 
 ## Notifications
 
@@ -469,4 +469,3 @@ The Events page shows all system activity:
 3. Review Events log for delivery errors
 4. Verify firewall allows outbound connections
 5. Check spam folder for emails
-
