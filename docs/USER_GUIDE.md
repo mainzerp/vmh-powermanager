@@ -271,7 +271,7 @@ During startup (power recovery), phases execute in **reverse order** based on st
 | Setting | Description | Default |
 |---------|-------------|---------|
 | **Execution Order** | Order within phase | Auto |
-| **Shutdown Timeout (s)** | Max wait for graceful shutdown | 300 |
+| **Shutdown Timeout (s)** | Max wait for graceful shutdown | 60 |
 | **Custom Command** | Optional shutdown command override | - |
 
 ### Plan Execution Flow
@@ -469,3 +469,4 @@ The Events page shows all system activity:
 3. Review Events log for delivery errors
 4. Verify firewall allows outbound connections
 5. Check spam folder for emails
+
