@@ -139,7 +139,7 @@ CELERY_GENERAL_CONCURRENCY=2
 
 ## Screenshots
 
-*Add screenshots of your dashboard, plan execution, and UPS monitoring here*
+<img width="1884" height="753" alt="grafik" src="https://github.com/user-attachments/assets/5fa6e630-9553-4176-bd65-7de1748ecb80" />
 
 ## License
 
