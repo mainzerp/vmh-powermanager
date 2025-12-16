@@ -139,7 +139,9 @@ CELERY_GENERAL_CONCURRENCY=2
 
 ## Screenshots
 
-[<img width="1884" height="753" alt="grafik" src="https://github.com/user-attachments/assets/5fa6e630-9553-4176-bd65-7de1748ecb80" />](https://github.com/mainzerp/vmh-powermanager/blob/main/docs/images/dashboard.png)
+
+![Screenshot]([https://github.com/mainzerp/vmh-powermanager/blob/main/docs/images/dashboard.png])
+
 
 ## License
 
