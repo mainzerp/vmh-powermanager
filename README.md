@@ -17,10 +17,10 @@ A comprehensive orchestration platform for managing VM and system power states d
 ### 🖥️ Multi-Platform VM Control
 | Platform | Capabilities |
 |----------|--------------|
-| VMware vCenter/ESXi | Full VM power control via API |
-| Proxmox VE | VM and container management |
-| Libvirt/KVM | Direct virsh integration |
-| Direct SSH | Custom shutdown commands |
+| VMware vCenter/ESXi | Full VM power control via API | Functional
+| Proxmox VE | VM and container management | Needs testing
+| Libvirt/KVM | Direct virsh integration | Functional
+| Direct SSH | Custom shutdown commands | Functional
 
 ### 📋 Orchestration Plans
 - Multi-phase execution (sequential and parallel)
