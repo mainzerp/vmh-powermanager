@@ -6,7 +6,7 @@
 
 A comprehensive orchestration platform for managing VM and system power states during UPS runtime events. Automatically detects low battery conditions and executes graceful shutdown/startup sequences for your infrastructure.
 
-**WIP** Core functionality implemented. Additional testing required for production readiness.
+**WIP:** Core functionality implemented. Additional testing required for production readiness.
 
 ## Features
 
