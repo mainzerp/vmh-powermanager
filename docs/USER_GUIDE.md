@@ -36,16 +36,16 @@ This guide explains how to use the VM Host Power Manager web interface to monito
 
 The main navigation is on the left sidebar:
 
-| Icon | Page | Description |
-|------|------|-------------|
-| 📊 | Dashboard | Overview of all systems and UPS status |
-| 🔋 | UPS Devices | Manage and monitor UPS units |
-| 🖥️ | Systems | Manage VMware/Proxmox hosts |
-| 📋 | Plans | Orchestration shutdown plans |
-| 🔔 | Notifications | Alert settings (Email, Webhook) |
-| 📜 | Events | System event log |
-| ⚙️ | Settings | Platform configuration |
-| 💾 | Backup | Backup and restore |
+Page | Description |
+------|-------------|
+Dashboard | Overview of all systems and UPS status |
+UPS Devices | Manage and monitor UPS units |
+Systems | Manage VMware/Proxmox hosts |
+Plans | Orchestration shutdown plans |
+Notifications | Alert settings (Email, Webhook) |
+Events | System event log |
+Settings | Platform configuration |
+Backup | Backup and restore |
 
 ---
 
@@ -105,10 +105,10 @@ Each UPS shows:
 
 ### UPS Actions
 
-- **📊 View Details**: Full status and history
-- **⚙️ Edit**: Modify settings
-- **🔄 Refresh**: Force status update
-- **🗑️ Delete**: Remove UPS device
+- **View Details**: Full status and history
+- **Edit**: Modify settings
+- **Refresh**: Force status update
+- **Delete**: Remove UPS device
 
 ### SNMP v3 Configuration
 
@@ -167,7 +167,7 @@ For SNMPv3, additional fields are required:
 | 🟢 Online | Connected and responsive |
 | 🟡 Degraded | Partial connectivity |
 | 🔴 Offline | Cannot connect |
-| ⏸️ Maintenance | Manually paused |
+| Maintenance | Manually paused |
 
 ### VM List
 
