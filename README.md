@@ -6,6 +6,8 @@
 
 A comprehensive orchestration platform for managing VM and system power states during UPS runtime events. Automatically detects low battery conditions and executes graceful shutdown/startup sequences for your infrastructure.
 
+**WIP** Core functionality implemented. Additional testing required for production readiness.
+
 ## Features
 
 ### UPS Monitoring
@@ -15,8 +17,8 @@ A comprehensive orchestration platform for managing VM and system power states d
 - Support for SNMP v1, v2c, and v3
 
 ### Multi-Platform VM Control
-| Platform | Capabilities |
-|----------|--------------|
+| Platform | Capabilities | State |
+|----------|--------------|--------------|
 | VMware vCenter/ESXi | Full VM power control via API | Functional
 | Proxmox VE | VM and container management | Needs testing
 | Libvirt/KVM | Direct virsh integration | Functional
