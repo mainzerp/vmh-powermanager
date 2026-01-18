@@ -8,13 +8,13 @@ A comprehensive orchestration platform for managing VM and system power states d
 
 ## Features
 
-### 🔌 UPS Monitoring
+### UPS Monitoring
 - Real-time SNMP monitoring of UPS devices (APC, CyberPower, etc.)
 - Battery runtime, charge level, and input voltage tracking
 - Automatic alerts when thresholds are breached
 - Support for SNMP v1, v2c, and v3
 
-### 🖥️ Multi-Platform VM Control
+### Multi-Platform VM Control
 | Platform | Capabilities |
 |----------|--------------|
 | VMware vCenter/ESXi | Full VM power control via API | Functional
@@ -22,14 +22,14 @@ A comprehensive orchestration platform for managing VM and system power states d
 | Libvirt/KVM | Direct virsh integration | Functional
 | Direct SSH | Custom shutdown commands | Functional
 
-### 📋 Orchestration Plans
+### Orchestration Plans
 - Multi-phase execution (sequential and parallel)
 - Graceful shutdown with configurable timeouts
 - Priority-based VM ordering
 - UPS-triggered automatic execution
 - Visual execution progress badges
 
-### 🔐 Security
+### Security
 - JWT-based authentication with TOTP 2FA support
 - Role-based access control
 - HTTPS with TLS encryption
